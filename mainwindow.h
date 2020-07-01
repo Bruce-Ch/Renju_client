@@ -33,13 +33,19 @@ private:
     void getWinner();
     void updateChessBoard();
     void updateGameInfo();
+    void updateLastInfo();
+    void getColor();
+
     void paintChessBoard(QPainter& painter);
     void paintGoMark(QPainter& painter);
+    void paintLastMark(QPainter& painter);
+
+    void sendInfo(std::vector<qint8> info);
     void updateWindow();
+
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
-    void getColor();
-    void sendInfo(std::vector<qint8> info);
+
     std::pair<int, int> xy2idx(int x, int y);
 
 private:
@@ -48,6 +54,7 @@ private:
     int row_ = 0, col_ = 0;
     int color_ = -1;
     QTcpSocket* client = nullptr;
+    int lastColor = -1, lastRow = 0, lastCol = 0;
 
 private slots:
     void setTimeLabel();

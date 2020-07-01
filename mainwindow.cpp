@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::timeToSue, this, &MainWindow::sueForPeace);
     connect(this, &MainWindow::timeToAbort, this, &MainWindow::abort);
     client = new QTcpSocket;
-    client->connectToHost("39.106.78.242", 9999);
+    client->connectToHost("39.106.78.242", 9997);
     getColor();
     connect(client, &QTcpSocket::readyRead, this, &MainWindow::implementMessage);
 }
@@ -60,6 +60,7 @@ void MainWindow::paintEvent(QPaintEvent *event){
     painter.setRenderHint(QPainter::Antialiasing);
     paintChessBoard(painter);
     paintGoMark(painter);
+    paintLastMark(painter);
     painter.end();
 }
 
@@ -89,6 +90,15 @@ void MainWindow::paintChessBoard(QPainter& painter){
     }
 }
 
+void MainWindow::paintLastMark(QPainter &painter){
+    if(lastColor == -1){ return; }
+    painter.save();
+    painter.setBrush(QColor(lastColor ? "white" : "black"));
+    painter.drawEllipse(32 * (lastCol - 1) + 88, 32 * (lastRow - 1) + 88, 8, 8);
+    painter.restore();
+
+}
+
 void MainWindow::updateWindow(){
     this->update();
 }
@@ -97,11 +107,18 @@ void MainWindow::updateGameInfo(){
     getCurrentPlayer();
     getWinner();
     updateChessBoard();
+    updateLastInfo();
 }
 
 void MainWindow::updateChessBoard(){
     std::vector<qint8> info;
     info.push_back(6);
+    sendInfo(info);
+}
+
+void MainWindow::updateLastInfo(){
+    std::vector<qint8> info;
+    info.push_back(9);
     sendInfo(info);
 }
 
@@ -259,6 +276,15 @@ void MainWindow::implementMessage(){
             exit(0);
             break;
         }
+        case 9:
+            clientstream >> cmd;
+            lastColor = cmd;
+            clientstream >> cmd;
+            lastRow = cmd;
+            clientstream >> cmd;
+            lastCol = cmd;
+            update();
+            break;
         default:
             qDebug() << "Unknown command: " << cmd;
         }
