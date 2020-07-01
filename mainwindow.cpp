@@ -16,8 +16,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::timeToRetract, this, &MainWindow::retract);
     connect(this, &MainWindow::timeToSue, this, &MainWindow::sueForPeace);
     connect(this, &MainWindow::timeToAbort, this, &MainWindow::abort);
-    client = new QTcpSocket;
-    client->connectToHost("39.106.78.242", 9997);
+    client = new QTcpSocket(this);
+    //client->connectToHost("127.0.0.1", 9997);
+    client->connectToHost("39.106.78.242", 9999);
     getColor();
     connect(client, &QTcpSocket::readyRead, this, &MainWindow::implementMessage);
 }
