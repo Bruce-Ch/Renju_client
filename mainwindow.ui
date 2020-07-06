@@ -32,9 +32,12 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
       <property name="sizeHint" stdset="0">
        <size>
-        <width>40</width>
+        <width>600</width>
         <height>20</height>
        </size>
       </property>
@@ -43,7 +46,7 @@
     <item>
      <widget class="QWidget" name="buttons" native="true">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -65,7 +68,30 @@
        <item>
         <widget class="QLabel" name="currentPlayer">
          <property name="text">
-          <string>Current Player: Black</string>
+          <string>Connection to server...</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="tip">
+         <property name="text">
+          <string>Tip: If the other player cannot connect to the server, you may quit and connect again.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="tip2">
+         <property name="text">
+          <string>Tip: If you cannot retract, it means your rival has quit the game.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

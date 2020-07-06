@@ -17,10 +17,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::timeToSue, this, &MainWindow::sueForPeace);
     connect(this, &MainWindow::timeToAbort, this, &MainWindow::abort);
     client = new QTcpSocket(this);
-    //client->connectToHost("127.0.0.1", 9997);
-    client->connectToHost("39.106.78.242", 9999);
+    client->connectToHost("127.0.0.1", 9999);
+    //client->connectToHost("39.106.78.242", 9999);
     getColor();
     connect(client, &QTcpSocket::readyRead, this, &MainWindow::implementMessage);
+    connect(client, &QTcpSocket::disconnected, this, &MainWindow::loseConnection);
 }
 
 MainWindow::~MainWindow()
@@ -178,6 +179,10 @@ void MainWindow::abort(){
     info.push_back(4);
     info.push_back(color_);
     sendInfo(info);
+}
+
+void MainWindow::loseConnection(){
+    ui->currentPlayer->setText("You have lost the connection!");
 }
 
 void MainWindow::implementMessage(){

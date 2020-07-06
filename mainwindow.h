@@ -63,6 +63,7 @@ private slots:
     void sueForPeace();
     void abort();
     void implementMessage();
+    void loseConnection();
 
 
     void on_retract_clicked();
