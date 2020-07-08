@@ -17,8 +17,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::timeToSue, this, &MainWindow::sueForPeace);
     connect(this, &MainWindow::timeToAbort, this, &MainWindow::abort);
     client = new QTcpSocket(this);
-    client->connectToHost("127.0.0.1", 9999);
-    //client->connectToHost("39.106.78.242", 9999);
+    //client->connectToHost("127.0.0.1", 9999);
+    client->connectToHost("39.106.78.242", 9999);
     getColor();
     connect(client, &QTcpSocket::readyRead, this, &MainWindow::implementMessage);
     connect(client, &QTcpSocket::disconnected, this, &MainWindow::loseConnection);
@@ -60,6 +60,8 @@ void MainWindow::sendInfo(std::vector<qint8> info){
 void MainWindow::paintEvent(QPaintEvent *event){
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
+    int side = qMin(int(ui->centralwidget->width() - ui->buttons->width()), ui->label->height());
+    painter.scale(side / 528.0, side / 528.0);
     paintChessBoard(painter);
     paintGoMark(painter);
     paintLastMark(painter);
@@ -69,7 +71,7 @@ void MainWindow::paintEvent(QPaintEvent *event){
 void MainWindow::paintChessBoard(QPainter& painter){
     for(int i = 0; i < 14; i ++){
         for(int j = 0; j < 14; j ++){
-            painter.drawRect(92 + j * 32, 92 + i * 32, 32, 32);
+            painter.drawRect(40 + j * 32, 80 + i * 32, 32, 32);
         }
     }
 
@@ -84,19 +86,27 @@ void MainWindow::paintChessBoard(QPainter& painter){
             } else if(clientBoard.color[i][j] == 1){
                 painter.setBrush(QColor("black"));
             }
-            int x = 32 * j + 80;
-            int y = 32 * i + 80;
+            int x = 32 * j + 28;
+            int y = 32 * i + 68;
             painter.drawEllipse(x, y, 24, 24);
             painter.restore();
         }
     }
 }
 
+void MainWindow::paintGoMark(QPainter& painter){
+    if(row_ == 0 && col_ == 0){ return; }
+    painter.save();
+    painter.setBrush(QColor(color_ ? "black" : "white"));
+    painter.drawEllipse(32 * (col_ - 1) + 36, 32 * (row_ - 1) + 76, 8, 8);
+    painter.restore();
+}
+
 void MainWindow::paintLastMark(QPainter &painter){
     if(lastColor == -1){ return; }
     painter.save();
     painter.setBrush(QColor(lastColor ? "white" : "black"));
-    painter.drawEllipse(32 * (lastCol - 1) + 88, 32 * (lastRow - 1) + 88, 8, 8);
+    painter.drawEllipse(32 * (lastCol - 1) + 36, 32 * (lastRow - 1) + 76, 8, 8);
     painter.restore();
 
 }
@@ -139,6 +149,8 @@ void MainWindow::setTimeLabel(){
 
 void MainWindow::mouseMoveEvent(QMouseEvent* event){
     int x = event->x(), y = event->y();
+    qDebug() << x << "    " << y;
+    std::tie(x, y) = getRealPoint(x, y);
     int row, col;
     std::tie(row, col) = xy2idx(x, y);
     row_ = row;
@@ -297,25 +309,25 @@ void MainWindow::implementMessage(){
     }
 }
 
-void MainWindow::paintGoMark(QPainter& painter){
-    if(row_ == 0 && col_ == 0){ return; }
-    painter.save();
-    painter.setBrush(QColor(color_ ? "black" : "white"));
-    painter.drawEllipse(32 * (col_ - 1) + 88, 32 * (row_ - 1) + 88, 8, 8);
-    painter.restore();
-}
-
 std::pair<int, int> MainWindow::xy2idx(int x, int y){
-    if(x > 552 || x < 80 || y > 552 || y < 80){
+    if(x > 500 || x < 28 || y > 540 || y < 68){
         return std::make_pair(0, 0);
     }
-    int row = (y - 80) / 32;
-    int col = (x - 80) / 32;
-    if((x - (col * 32 + 92)) * (x - (col * 32 + 92)) + (y - (row * 32 + 92)) * (y - (row * 32 + 92)) <= 144){
+    int row = (y - 68) / 32;
+    int col = (x - 28) / 32;
+    if((x - (col * 32 + 40)) * (x - (col * 32 + 40)) + (y - (row * 32 + 80)) * (y - (row * 32 + 80)) <= 144){
         return std::make_pair(row + 1, col + 1);
     } else {
         return std::make_pair(0, 0);
     }
+}
+
+std::pair<int, int> MainWindow::getRealPoint(int x, int y){
+    double rx, ry;
+    double side = qMin(int(ui->centralwidget->width() - ui->buttons->width()), ui->label->height());
+    rx = x / side * 528.0;
+    ry = y / side * 528.0;
+    return std::make_pair(int(rx), int(ry));
 }
 
 void MainWindow::on_retract_clicked()

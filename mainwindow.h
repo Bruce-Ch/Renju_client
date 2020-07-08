@@ -47,6 +47,7 @@ private:
     void mouseReleaseEvent(QMouseEvent* event) override;
 
     std::pair<int, int> xy2idx(int x, int y);
+    std::pair<int, int> getRealPoint(int x, int y);
 
 private:
     Ui::MainWindow *ui;
