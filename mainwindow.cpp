@@ -60,7 +60,7 @@ void MainWindow::sendInfo(std::vector<qint8> info){
 void MainWindow::paintEvent(QPaintEvent *event){
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
-    int side = qMin(int(ui->centralwidget->width() - ui->buttons->width()), ui->label->height());
+    int side = qMin(int(ui->centralwidget->width() - ui->buttons->width()), ui->centralwidget->height());
     painter.scale(side / 528.0, side / 528.0);
     paintChessBoard(painter);
     paintGoMark(painter);
@@ -149,7 +149,6 @@ void MainWindow::setTimeLabel(){
 
 void MainWindow::mouseMoveEvent(QMouseEvent* event){
     int x = event->x(), y = event->y();
-    qDebug() << x << "    " << y;
     std::tie(x, y) = getRealPoint(x, y);
     int row, col;
     std::tie(row, col) = xy2idx(x, y);
@@ -324,7 +323,7 @@ std::pair<int, int> MainWindow::xy2idx(int x, int y){
 
 std::pair<int, int> MainWindow::getRealPoint(int x, int y){
     double rx, ry;
-    double side = qMin(int(ui->centralwidget->width() - ui->buttons->width()), ui->label->height());
+    double side = qMin(int(ui->centralwidget->width() - ui->buttons->width()), ui->centralwidget->height());
     rx = x / side * 528.0;
     ry = y / side * 528.0;
     return std::make_pair(int(rx), int(ry));
