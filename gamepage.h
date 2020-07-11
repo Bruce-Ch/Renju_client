@@ -26,7 +26,7 @@ class GamePage : public QMainWindow
 
 public:
     GamePage(QWidget *parent = nullptr);
-    ~GamePage();
+    virtual ~GamePage();
 
 protected:
     void paintEvent(QPaintEvent* event) override;
