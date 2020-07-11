@@ -1,54 +1,56 @@
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "gamepage.h"
+#include "ui_gamepage.h"
 
-MainWindow::MainWindow(QWidget *parent)
+GamePage::GamePage(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    , ui(new Ui::GamePage)
 {
     ui->setupUi(this);
     QTimer* timer = new QTimer(this);
     timer->start(1000);
-    connect(timer, &QTimer::timeout, this, &MainWindow::setTimeLabel);
-    connect(timer, &QTimer::timeout, this, &MainWindow::updateGameInfo);
+    connect(timer, &QTimer::timeout, this, &GamePage::setTimeLabel);
+    connect(timer, &QTimer::timeout, this, &GamePage::updateGameInfo);
     setMouseTracking(true);
     ui->centralwidget->setMouseTracking(true);
-    connect(this, &MainWindow::timeToGo, this, &MainWindow::go);
-    connect(this, &MainWindow::timeToRetract, this, &MainWindow::retract);
-    connect(this, &MainWindow::timeToSue, this, &MainWindow::sueForPeace);
-    connect(this, &MainWindow::timeToAbort, this, &MainWindow::abort);
+    connect(this, &GamePage::timeToGo, this, &GamePage::go);
+    connect(this, &GamePage::timeToRetract, this, &GamePage::retract);
+    connect(this, &GamePage::timeToSue, this, &GamePage::sueForPeace);
+    connect(this, &GamePage::timeToAbort, this, &GamePage::abort);
     client = new QTcpSocket(this);
     //client->connectToHost("127.0.0.1", 9999);
     client->connectToHost("39.106.78.242", 9999);
-    getColor();
-    connect(client, &QTcpSocket::readyRead, this, &MainWindow::implementMessage);
-    connect(client, &QTcpSocket::disconnected, this, &MainWindow::loseConnection);
+    //getColor();
+    connect(client, &QTcpSocket::readyRead, this, &GamePage::implementMessage);
+    connect(client, &QTcpSocket::disconnected, this, &GamePage::loseConnection);
 }
 
-MainWindow::~MainWindow()
+GamePage::~GamePage()
 {
     delete ui;
     delete client;
 }
 
-void MainWindow::getColor(){
+/*
+void GamePage::getColor(){
     std::vector<qint8> info;
     info.push_back(5);
     sendInfo(info);
 }
+*/
 
-void MainWindow::getCurrentPlayer(){
+void GamePage::getCurrentPlayer(){
     std::vector<qint8> info;
     info.push_back(7);
     sendInfo(info);
 }
 
-void MainWindow::getWinner(){
+void GamePage::getWinner(){
     std::vector<qint8> info;
     info.push_back(8);
     sendInfo(info);
 }
 
-void MainWindow::sendInfo(std::vector<qint8> info){
+void GamePage::sendInfo(std::vector<qint8> info){
     QByteArray block;
     QDataStream clientStream(&block, QIODevice::ReadWrite);
     for(qint8 num: info){
@@ -57,7 +59,7 @@ void MainWindow::sendInfo(std::vector<qint8> info){
     client->write(block);
 }
 
-void MainWindow::paintEvent(QPaintEvent *event){
+void GamePage::paintEvent(QPaintEvent *event){
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     int side = qMin(int(ui->centralwidget->width() - ui->buttons->width()), ui->centralwidget->height());
@@ -68,10 +70,10 @@ void MainWindow::paintEvent(QPaintEvent *event){
     painter.end();
 }
 
-void MainWindow::paintChessBoard(QPainter& painter){
+void GamePage::paintChessBoard(QPainter& painter){
     for(int i = 0; i < 14; i ++){
         for(int j = 0; j < 14; j ++){
-            painter.drawRect(40 + j * 32, 80 + i * 32, 32, 32);
+            painter.drawRect(50 + j * 32, 50 + i * 32, 32, 32);
         }
     }
 
@@ -86,55 +88,55 @@ void MainWindow::paintChessBoard(QPainter& painter){
             } else if(clientBoard.color[i][j] == 1){
                 painter.setBrush(QColor("black"));
             }
-            int x = 32 * j + 28;
-            int y = 32 * i + 68;
+            int x = 32 * j + 38;
+            int y = 32 * i + 38;
             painter.drawEllipse(x, y, 24, 24);
             painter.restore();
         }
     }
 }
 
-void MainWindow::paintGoMark(QPainter& painter){
+void GamePage::paintGoMark(QPainter& painter){
     if(row_ == 0 && col_ == 0){ return; }
     painter.save();
     painter.setBrush(QColor(color_ ? "black" : "white"));
-    painter.drawEllipse(32 * (col_ - 1) + 36, 32 * (row_ - 1) + 76, 8, 8);
+    painter.drawEllipse(32 * (col_ - 1) + 46, 32 * (row_ - 1) + 46, 8, 8);
     painter.restore();
 }
 
-void MainWindow::paintLastMark(QPainter &painter){
+void GamePage::paintLastMark(QPainter &painter){
     if(lastColor == -1){ return; }
     painter.save();
     painter.setBrush(QColor(lastColor ? "white" : "black"));
-    painter.drawEllipse(32 * (lastCol - 1) + 36, 32 * (lastRow - 1) + 76, 8, 8);
+    painter.drawEllipse(32 * (lastCol - 1) + 46, 32 * (lastRow - 1) + 46, 8, 8);
     painter.restore();
 
 }
 
-void MainWindow::updateWindow(){
+void GamePage::updateWindow(){
     this->update();
 }
 
-void MainWindow::updateGameInfo(){
+void GamePage::updateGameInfo(){
     getCurrentPlayer();
     getWinner();
     updateChessBoard();
     updateLastInfo();
 }
 
-void MainWindow::updateChessBoard(){
+void GamePage::updateChessBoard(){
     std::vector<qint8> info;
     info.push_back(6);
     sendInfo(info);
 }
 
-void MainWindow::updateLastInfo(){
+void GamePage::updateLastInfo(){
     std::vector<qint8> info;
     info.push_back(9);
     sendInfo(info);
 }
 
-void MainWindow::setTimeLabel(){
+void GamePage::setTimeLabel(){
     QTime time = QTime::currentTime();
     QString hour, min, sec;
     hour.setNum(time.hour());
@@ -147,7 +149,7 @@ void MainWindow::setTimeLabel(){
     ui->timeLabel->setText(hour);
 }
 
-void MainWindow::mouseMoveEvent(QMouseEvent* event){
+void GamePage::mouseMoveEvent(QMouseEvent* event){
     int x = event->x(), y = event->y();
     std::tie(x, y) = getRealPoint(x, y);
     int row, col;
@@ -157,12 +159,12 @@ void MainWindow::mouseMoveEvent(QMouseEvent* event){
     update();
 }
 
-void MainWindow::mouseReleaseEvent(QMouseEvent *event){
+void GamePage::mouseReleaseEvent(QMouseEvent *event){
     if(row_ == 0 && col_ == 0){ return; }
     emit timeToGo(row_, col_);
 }
 
-void MainWindow::go(int row, int col){
+void GamePage::go(int row, int col){
     std::vector<qint8> info;
     info.push_back(1);
     info.push_back(color_);
@@ -171,32 +173,32 @@ void MainWindow::go(int row, int col){
     sendInfo(info);
 }
 
-void MainWindow::retract(){
+void GamePage::retract(){
     std::vector<qint8> info;
     info.push_back(2);
     info.push_back(color_);
     sendInfo(info);
 }
 
-void MainWindow::sueForPeace(){
+void GamePage::sueForPeace(){
     std::vector<qint8> info;
     info.push_back(3);
     info.push_back(color_);
     sendInfo(info);
 }
 
-void MainWindow::abort(){
+void GamePage::abort(){
     std::vector<qint8> info;
     info.push_back(4);
     info.push_back(color_);
     sendInfo(info);
 }
 
-void MainWindow::loseConnection(){
+void GamePage::loseConnection(){
     ui->currentPlayer->setText("You have lost the connection!");
 }
 
-void MainWindow::implementMessage(){
+void GamePage::implementMessage(){
     QByteArray array = client->readAll();
     QDataStream clientstream(&array, QIODevice::ReadWrite);
     qint8 cmd;
@@ -308,20 +310,20 @@ void MainWindow::implementMessage(){
     }
 }
 
-std::pair<int, int> MainWindow::xy2idx(int x, int y){
-    if(x > 500 || x < 28 || y > 540 || y < 68){
+std::pair<int, int> GamePage::xy2idx(int x, int y){
+    if(x > 510 || x < 38 || y > 510 || y < 38){
         return std::make_pair(0, 0);
     }
-    int row = (y - 68) / 32;
-    int col = (x - 28) / 32;
-    if((x - (col * 32 + 40)) * (x - (col * 32 + 40)) + (y - (row * 32 + 80)) * (y - (row * 32 + 80)) <= 144){
+    int row = (y - 38) / 32;
+    int col = (x - 38) / 32;
+    if((x - (col * 32 + 50)) * (x - (col * 32 + 50)) + (y - (row * 32 + 50)) * (y - (row * 32 + 50)) <= 144){
         return std::make_pair(row + 1, col + 1);
     } else {
         return std::make_pair(0, 0);
     }
 }
 
-std::pair<int, int> MainWindow::getRealPoint(int x, int y){
+std::pair<int, int> GamePage::getRealPoint(int x, int y){
     double rx, ry;
     double side = qMin(int(ui->centralwidget->width() - ui->buttons->width()), ui->centralwidget->height());
     rx = x / side * 528.0;
@@ -329,17 +331,17 @@ std::pair<int, int> MainWindow::getRealPoint(int x, int y){
     return std::make_pair(int(rx), int(ry));
 }
 
-void MainWindow::on_retract_clicked()
+void GamePage::on_retract_clicked()
 {
     emit timeToRetract();
 }
 
-void MainWindow::on_sueForPeace_clicked()
+void GamePage::on_sueForPeace_clicked()
 {
     emit timeToSue();
 }
 
-void MainWindow::on_abort_clicked()
+void GamePage::on_abort_clicked()
 {
     emit timeToAbort();
 }

@@ -17,15 +17,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     clientboard.cpp \
+    internetgamepage.cpp \
     main.cpp \
-    mainwindow.cpp
+    gamepage.cpp
 
 HEADERS += \
     clientboard.h \
-    mainwindow.h
+    gamepage.h \
+    internetgamepage.h
 
 FORMS += \
-    mainwindow.ui
+    gamepage.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

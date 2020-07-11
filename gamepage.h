@@ -17,24 +17,29 @@
 #include "clientboard.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
+namespace Ui { class GamePage; }
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow
+class GamePage : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    GamePage(QWidget *parent = nullptr);
+    ~GamePage();
+
+protected:
     void paintEvent(QPaintEvent* event) override;
-private:
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
+
     void getCurrentPlayer();
     void getWinner();
+    //void getColor();
+
     void updateChessBoard();
     void updateGameInfo();
     void updateLastInfo();
-    void getColor();
 
     void paintChessBoard(QPainter& painter);
     void paintGoMark(QPainter& painter);
@@ -43,21 +48,20 @@ private:
     void sendInfo(std::vector<qint8> info);
     void updateWindow();
 
-    void mouseMoveEvent(QMouseEvent* event) override;
-    void mouseReleaseEvent(QMouseEvent* event) override;
-
     std::pair<int, int> xy2idx(int x, int y);
     std::pair<int, int> getRealPoint(int x, int y);
 
 private:
-    Ui::MainWindow *ui;
+    Ui::GamePage *ui;
     ClientBoard clientBoard;
     int row_ = 0, col_ = 0;
-    int color_ = -1;
     QTcpSocket* client = nullptr;
     int lastColor = -1, lastRow = 0, lastCol = 0;
 
-private slots:
+protected:
+    int color_ = -1;
+
+protected slots:
     void setTimeLabel();
     void go(int row, int col);
     void retract();
@@ -68,9 +72,7 @@ private slots:
 
 
     void on_retract_clicked();
-
     void on_sueForPeace_clicked();
-
     void on_abort_clicked();
 
 signals:

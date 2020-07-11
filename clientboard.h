@@ -12,7 +12,7 @@ class ClientBoard
 public:
     ClientBoard();
     void update(const QString& info);
-    friend class MainWindow;
+    friend class GamePage;
 };
 
 #endif // CLIENTBOARD_H
