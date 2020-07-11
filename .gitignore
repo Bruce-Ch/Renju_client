@@ -1,4 +1,7 @@
+# Automatically add by MacOS
+
 .DS_Store
 
-/*.pro.user
+# Automatically add by QtCreator to config 
 
+*.pro.user
