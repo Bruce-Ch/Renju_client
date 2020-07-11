@@ -16,17 +16,20 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    choosepage.cpp \
     clientboard.cpp \
     internetgamepage.cpp \
     main.cpp \
     gamepage.cpp
 
 HEADERS += \
+    choosepage.h \
     clientboard.h \
     gamepage.h \
     internetgamepage.h
 
 FORMS += \
+    choosepage.ui \
     gamepage.ui
 
 # Default rules for deployment.
