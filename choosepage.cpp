@@ -16,10 +16,9 @@ ChoosePage::~ChoosePage()
 
 void ChoosePage::on_oneMachine_clicked()
 {
-    QMessageBox msgBox(this);
-    QString str = "该功能当前尚未开放！";
-    msgBox.setText(str);
-    msgBox.exec();
+    gamePage = new HomeGamePage;
+    close();
+    gamePage->show();
 }
 
 void ChoosePage::on_twoMachine_clicked()

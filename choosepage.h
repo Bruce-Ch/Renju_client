@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include "gamepage.h"
 #include "internetgamepage.h"
+#include "homegamepage.h"
 
 namespace Ui {
 class ChoosePage;

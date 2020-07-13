@@ -17,7 +17,7 @@ GamePage::GamePage(QWidget *parent)
     connect(this, &GamePage::timeToSue, this, &GamePage::sueForPeace);
     connect(this, &GamePage::timeToAbort, this, &GamePage::abort);
     client = new QTcpSocket(this);
-    //client->connectToHost("127.0.0.1", 8899);
+    //client->connectToHost("127.0.0.1", 10086);
     client->connectToHost("39.106.78.242", 10086);
     connect(client, &QTcpSocket::readyRead, this, &GamePage::implementMessage);
     connect(client, &QTcpSocket::disconnected, this, &GamePage::loseConnection);

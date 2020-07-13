@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     choosepage.cpp \
     clientboard.cpp \
+    homegamepage.cpp \
     internetgamepage.cpp \
     main.cpp \
     gamepage.cpp
@@ -26,6 +27,7 @@ HEADERS += \
     choosepage.h \
     clientboard.h \
     gamepage.h \
+    homegamepage.h \
     internetgamepage.h
 
 FORMS += \
