@@ -179,6 +179,94 @@ void GamePage::loseConnection(){
     ui->currentPlayer->setText("You have lost the connection!");
 }
 
+void GamePage::goImplement(const QVector<qint8>& subcmd){
+    updateGameInfo();
+}
+
+void GamePage::retractImplement(const QVector<qint8>& subcmd){
+    updateGameInfo();
+    if(!subcmd[0]){
+    } else if(subcmd[0] == 1){
+        QMessageBox msgBox;
+        QString info = "The other player don't allow you to retract.";
+        msgBox.setText(info);
+        msgBox.exec();
+    } else if(subcmd[0] == 2){
+        QMessageBox msgBox;
+        QString info = "There is nothing to retract.";
+        msgBox.setText(info);
+        msgBox.exec();
+    } else {
+        qDebug() << "There is something wrong when trying to retract.";
+    }
+}
+
+void GamePage::sueForPeaceImplement(const QVector<qint8>& subcmd){
+    updateGameInfo();
+    if(!subcmd[0]){
+    } else if(subcmd[0] == 1){
+        QMessageBox msgBox;
+        QString info = "The other player do not want a tie.";
+        msgBox.setText(info);
+        msgBox.exec();
+    } else {
+        qDebug() << "There is something wrong when suing for peace.";
+    }
+}
+
+void GamePage::abortImplement(const QVector<qint8>& subcmd){
+    updateGameInfo();
+    if(!subcmd[0]){
+    } else if(subcmd[0] == 1){
+        QMessageBox msgBox;
+        QString info = "You cannot abort now.";
+        msgBox.setText(info);
+        msgBox.exec();
+    } else {
+        qDebug() << "There is something wrong when aborting.";
+    }
+}
+
+void GamePage::getColorImplement(const QVector<qint8>& subcmd){
+    color_ = subcmd[0];
+}
+
+void GamePage::updateChessBoardImplement(const QString& info){
+    clientBoard.update(info);
+    update();
+}
+
+void GamePage::getCurrentPlayerImplement(const QVector<qint8>& subcmd){
+    QString text = "Current Player: ";
+    text += (subcmd[0] ? "Black" : "White");
+    ui->currentPlayer->setText(text);
+}
+
+void GamePage::getWinnerImplement(const QVector<qint8>& subcmd){
+    if(subcmd[0] == -1){
+        return;
+    }
+    QMessageBox msgBox;
+    if(subcmd[0] == 2){
+        QString info = "Game over with a tie.";
+        msgBox.setText(info);
+    } else {
+        QString info = "The winner is ";
+        info += (subcmd[0] ? "black" : "white");
+        info += ".";
+        msgBox.setText(info);
+    }
+    msgBox.exec();
+    exit(0);
+}
+
+void GamePage::updateLastImplement(const QVector<qint8>& subcmd){
+    lastColor = subcmd[0];
+    lastRow = subcmd[1];
+    lastCol = subcmd[2];
+    update();
+}
+
 void GamePage::implementMessage(){
     QByteArray array = client->readAll();
     QDataStream clientstream(&array, QIODevice::ReadWrite);
@@ -191,107 +279,55 @@ void GamePage::implementMessage(){
         case 1:{
             QVector<qint8> subcmd;
             clientstream >> subcmd;
-            updateGameInfo();
+            goImplement(subcmd);
             break;
         }
         case 2:{
-            updateGameInfo();
             QVector<qint8> subcmd;
             clientstream >> subcmd;
-            if(!subcmd[0]){
-            } else if(subcmd[0] == 1){
-                QMessageBox msgBox;
-                QString info = "The other player don't allow you to retract.";
-                msgBox.setText(info);
-                msgBox.exec();
-            } else if(subcmd[0] == 2){
-                QMessageBox msgBox;
-                QString info = "There is nothing to retract.";
-                msgBox.setText(info);
-                msgBox.exec();
-            } else {
-                qDebug() << "There is something wrong when trying to retract.";
-            }
+            retractImplement(subcmd);
             break;
         }
         case 3:{
-            updateGameInfo();
             QVector<qint8> subcmd;
             clientstream >> subcmd;
-            if(!subcmd[0]){
-            } else if(subcmd[0] == 1){
-                QMessageBox msgBox;
-                QString info = "The other player do not want a tie.";
-                msgBox.setText(info);
-                msgBox.exec();
-            } else {
-                qDebug() << "There is something wrong when suing for peace.";
-            }
+            sueForPeaceImplement(subcmd);
             break;
         }
         case 4:{
-            updateGameInfo();
             QVector<qint8> subcmd;
             clientstream >> subcmd;
-            if(!subcmd[0]){
-            } else if(subcmd[0] == 1){
-                QMessageBox msgBox;
-                QString info = "You cannot abort now.";
-                msgBox.setText(info);
-                msgBox.exec();
-            } else {
-                qDebug() << "There is something wrong when aborting.";
-            }
+            abortImplement(subcmd);
             break;
         }
         case 5:{
             QVector<qint8> subcmd;
             clientstream >> subcmd;
-            color_ = subcmd[0];
+            getColorImplement(subcmd);
             break;
         }
         case 6:{
             QString info;
             clientstream >> info;
-            clientBoard.update(info);
-            update();
+            updateChessBoardImplement(info);
             break;
         }
         case 7:{
             QVector<qint8> subcmd;
             clientstream >> subcmd;
-            QString text = "Current Player: ";
-            text += (subcmd[0] ? "Black" : "White");
-            ui->currentPlayer->setText(text);
+            getCurrentPlayerImplement(subcmd);
             break;
         }
         case 8:{
             QVector<qint8> subcmd;
             clientstream >> subcmd;
-            if(subcmd[0] == -1){
-                break;
-            }
-            QMessageBox msgBox;
-            if(subcmd[0] == 2){
-                QString info = "Game over with a tie.";
-                msgBox.setText(info);
-            } else {
-                QString info = "The winner is ";
-                info += (subcmd[0] ? "black" : "white");
-                info += ".";
-                msgBox.setText(info);
-            }
-            msgBox.exec();
-            exit(0);
+            getWinnerImplement(subcmd);
             break;
         }
         case 9:{
             QVector<qint8> subcmd;
             clientstream >> subcmd;
-            lastColor = subcmd[0];
-            lastRow = subcmd[1];
-            lastCol = subcmd[2];
-            update();
+            updateLastImplement(subcmd);
             break;
         }
         default:

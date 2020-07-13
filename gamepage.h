@@ -8,6 +8,7 @@
 #include <QMouseEvent>
 #include <QMessageBox>
 #include <QTcpSocket>
+#include <QVector>
 #include <tuple>
 #include <string>
 #include <sstream>
@@ -47,6 +48,16 @@ protected:
 
     void sendInfo(qint8 cmd, const QVector<qint8>& info);
     void updateWindow();
+
+    virtual void goImplement(const QVector<qint8>& subcmd);
+    virtual void retractImplement(const QVector<qint8>& subcmd);
+    virtual void sueForPeaceImplement(const QVector<qint8>& subcmd);
+    virtual void abortImplement(const QVector<qint8>& subcmd);
+    virtual void getColorImplement(const QVector<qint8>& subcmd);
+    virtual void updateChessBoardImplement(const QString& info);
+    virtual void getCurrentPlayerImplement(const QVector<qint8>& subcmd);
+    virtual void getWinnerImplement(const QVector<qint8>& subcmd);
+    virtual void updateLastImplement(const QVector<qint8>& subcmd);
 
     std::pair<int, int> xy2idx(int x, int y);
     std::pair<int, int> getRealPoint(int x, int y);
