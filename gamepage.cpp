@@ -17,9 +17,8 @@ GamePage::GamePage(QWidget *parent)
     connect(this, &GamePage::timeToSue, this, &GamePage::sueForPeace);
     connect(this, &GamePage::timeToAbort, this, &GamePage::abort);
     client = new QTcpSocket(this);
-    //client->connectToHost("127.0.0.1", 9999);
+    //client->connectToHost("127.0.0.1", 8899);
     client->connectToHost("39.106.78.242", 9999);
-    //getColor();
     connect(client, &QTcpSocket::readyRead, this, &GamePage::implementMessage);
     connect(client, &QTcpSocket::disconnected, this, &GamePage::loseConnection);
 }
@@ -30,32 +29,20 @@ GamePage::~GamePage()
     delete client;
 }
 
-/*
-void GamePage::getColor(){
-    std::vector<qint8> info;
-    info.push_back(5);
-    sendInfo(info);
-}
-*/
-
 void GamePage::getCurrentPlayer(){
-    std::vector<qint8> info;
-    info.push_back(7);
-    sendInfo(info);
+    QVector<qint8> info;
+    sendInfo(7, info);
 }
 
 void GamePage::getWinner(){
-    std::vector<qint8> info;
-    info.push_back(8);
-    sendInfo(info);
+    QVector<qint8> info;
+    sendInfo(8, info);
 }
 
-void GamePage::sendInfo(std::vector<qint8> info){
+void GamePage::sendInfo(qint8 cmd, const QVector<qint8>& info){
     QByteArray block;
     QDataStream clientStream(&block, QIODevice::ReadWrite);
-    for(qint8 num: info){
-        clientStream << num;
-    }
+    clientStream << cmd << info;
     client->write(block);
 }
 
@@ -125,15 +112,13 @@ void GamePage::updateGameInfo(){
 }
 
 void GamePage::updateChessBoard(){
-    std::vector<qint8> info;
-    info.push_back(6);
-    sendInfo(info);
+    QVector<qint8> info;
+    sendInfo(6, info);
 }
 
 void GamePage::updateLastInfo(){
-    std::vector<qint8> info;
-    info.push_back(9);
-    sendInfo(info);
+    QVector<qint8> info;
+    sendInfo(9, info);
 }
 
 void GamePage::setTimeLabel(){
@@ -165,33 +150,29 @@ void GamePage::mouseReleaseEvent(QMouseEvent *event){
 }
 
 void GamePage::go(int row, int col){
-    std::vector<qint8> info;
-    info.push_back(1);
+    QVector<qint8> info;
     info.push_back(color_);
     info.push_back(row);
     info.push_back(col);
-    sendInfo(info);
+    sendInfo(1, info);
 }
 
 void GamePage::retract(){
-    std::vector<qint8> info;
-    info.push_back(2);
+    QVector<qint8> info;
     info.push_back(color_);
-    sendInfo(info);
+    sendInfo(2, info);
 }
 
 void GamePage::sueForPeace(){
-    std::vector<qint8> info;
-    info.push_back(3);
+    QVector<qint8> info;
     info.push_back(color_);
-    sendInfo(info);
+    sendInfo(3, info);
 }
 
 void GamePage::abort(){
-    std::vector<qint8> info;
-    info.push_back(4);
+    QVector<qint8> info;
     info.push_back(color_);
-    sendInfo(info);
+    sendInfo(4, info);
 }
 
 void GamePage::loseConnection(){
@@ -207,23 +188,23 @@ void GamePage::implementMessage(){
         switch (cmd) {
         case 0:
             return;
-        case 1:
-            clientstream >> cmd;
-            if(cmd){
-                clientstream >> cmd >> cmd >> cmd;
-            }
+        case 1:{
+            QVector<qint8> subcmd;
+            clientstream >> subcmd;
             updateGameInfo();
             break;
-        case 2:
+        }
+        case 2:{
             updateGameInfo();
-            clientstream >> cmd;
-            if(!cmd){
-            } else if(cmd == 1){
+            QVector<qint8> subcmd;
+            clientstream >> subcmd;
+            if(!subcmd[0]){
+            } else if(subcmd[0] == 1){
                 QMessageBox msgBox;
                 QString info = "The other player don't allow you to retract.";
                 msgBox.setText(info);
                 msgBox.exec();
-            } else if(cmd == 2){
+            } else if(subcmd[0] == 2){
                 QMessageBox msgBox;
                 QString info = "There is nothing to retract.";
                 msgBox.setText(info);
@@ -232,11 +213,13 @@ void GamePage::implementMessage(){
                 qDebug() << "There is something wrong when trying to retract.";
             }
             break;
-        case 3:
+        }
+        case 3:{
             updateGameInfo();
-            clientstream >> cmd;
-            if(!cmd){
-            } else if(cmd == 1){
+            QVector<qint8> subcmd;
+            clientstream >> subcmd;
+            if(!subcmd[0]){
+            } else if(subcmd[0] == 1){
                 QMessageBox msgBox;
                 QString info = "The other player do not want a tie.";
                 msgBox.setText(info);
@@ -245,11 +228,13 @@ void GamePage::implementMessage(){
                 qDebug() << "There is something wrong when suing for peace.";
             }
             break;
-        case 4:
+        }
+        case 4:{
             updateGameInfo();
-            clientstream >> cmd;
-            if(!cmd){
-            } else if(cmd == 1){
+            QVector<qint8> subcmd;
+            clientstream >> subcmd;
+            if(!subcmd[0]){
+            } else if(subcmd[0] == 1){
                 QMessageBox msgBox;
                 QString info = "You cannot abort now.";
                 msgBox.setText(info);
@@ -258,10 +243,13 @@ void GamePage::implementMessage(){
                 qDebug() << "There is something wrong when aborting.";
             }
             break;
-        case 5:
-            clientstream >> cmd;
-            color_ = cmd;
+        }
+        case 5:{
+            QVector<qint8> subcmd;
+            clientstream >> subcmd;
+            color_ = subcmd[0];
             break;
+        }
         case 6:{
             QString info;
             clientstream >> info;
@@ -270,24 +258,26 @@ void GamePage::implementMessage(){
             break;
         }
         case 7:{
-            clientstream >> cmd;
+            QVector<qint8> subcmd;
+            clientstream >> subcmd;
             QString text = "Current Player: ";
-            text += (cmd ? "Black" : "White");
+            text += (subcmd[0] ? "Black" : "White");
             ui->currentPlayer->setText(text);
             break;
         }
         case 8:{
-            clientstream >> cmd;
-            if(cmd == -1){
+            QVector<qint8> subcmd;
+            clientstream >> subcmd;
+            if(subcmd[0] == -1){
                 break;
             }
             QMessageBox msgBox;
-            if(cmd == 2){
+            if(subcmd[0] == 2){
                 QString info = "Game over with a tie.";
                 msgBox.setText(info);
             } else {
                 QString info = "The winner is ";
-                info += (cmd ? "black" : "white");
+                info += (subcmd[0] ? "black" : "white");
                 info += ".";
                 msgBox.setText(info);
             }
@@ -295,15 +285,15 @@ void GamePage::implementMessage(){
             exit(0);
             break;
         }
-        case 9:
-            clientstream >> cmd;
-            lastColor = cmd;
-            clientstream >> cmd;
-            lastRow = cmd;
-            clientstream >> cmd;
-            lastCol = cmd;
+        case 9:{
+            QVector<qint8> subcmd;
+            clientstream >> subcmd;
+            lastColor = subcmd[0];
+            lastRow = subcmd[1];
+            lastCol = subcmd[2];
             update();
             break;
+        }
         default:
             qDebug() << "Unknown command: " << cmd;
         }

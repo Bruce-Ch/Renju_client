@@ -45,7 +45,7 @@ protected:
     void paintGoMark(QPainter& painter);
     void paintLastMark(QPainter& painter);
 
-    void sendInfo(std::vector<qint8> info);
+    void sendInfo(qint8 cmd, const QVector<qint8>& info);
     void updateWindow();
 
     std::pair<int, int> xy2idx(int x, int y);
