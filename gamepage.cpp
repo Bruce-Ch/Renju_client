@@ -19,6 +19,7 @@ GamePage::GamePage(QWidget *parent)
     client = new QTcpSocket(this);
     //client->connectToHost("127.0.0.1", 10086);
     client->connectToHost("39.106.78.242", 10086);
+    connect(client, &QTcpSocket::connected, this, &GamePage::versionVerify);
     connect(client, &QTcpSocket::readyRead, this, &GamePage::implementMessage);
     connect(client, &QTcpSocket::disconnected, this, &GamePage::loseConnection);
 }
@@ -27,6 +28,12 @@ GamePage::~GamePage()
 {
     delete ui;
     delete client;
+}
+
+void GamePage::versionVerify(){
+    QVector<qint8> version;
+    version << 0 << 2 << 0;
+    sendInfo(10, version);
 }
 
 void GamePage::getCurrentPlayer(){
@@ -267,6 +274,16 @@ void GamePage::updateLastImplement(const QVector<qint8>& subcmd){
     update();
 }
 
+void GamePage::versionVerifyImplement(const QVector<qint8> &subcmd){
+    if(subcmd[0]){
+        QMessageBox msgBox;
+        QString info = "The version is too low. Please download the newest release.";
+        msgBox.setText(info);
+        msgBox.exec();
+        exit(1);
+    }
+}
+
 void GamePage::implementMessage(){
     QByteArray array = client->readAll();
     QDataStream clientstream(&array, QIODevice::ReadWrite);
@@ -328,6 +345,12 @@ void GamePage::implementMessage(){
             QVector<qint8> subcmd;
             clientstream >> subcmd;
             updateLastImplement(subcmd);
+            break;
+        }
+        case 10:{
+            QVector<qint8> subcmd;
+            clientstream >> subcmd;
+            versionVerifyImplement(subcmd);
             break;
         }
         default:
