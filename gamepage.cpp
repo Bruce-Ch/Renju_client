@@ -65,10 +65,9 @@ void GamePage::paintEvent(QPaintEvent *event){
 }
 
 void GamePage::paintChessBoard(QPainter& painter){
-    for(int i = 0; i < 14; i ++){
-        for(int j = 0; j < 14; j ++){
-            painter.drawRect(50 + j * 32, 50 + i * 32, 32, 32);
-        }
+    for (int i = 0; i < 15; i++) {
+        painter.drawLine(50 + i * 32, 50, 50 + i * 32, 498);
+        painter.drawLine(50, 50 + i * 32, 498, 50 + i * 32);
     }
 
     for(int i = 0; i < 15; i ++){
