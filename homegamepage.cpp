@@ -3,8 +3,8 @@
 HomeGamePage::HomeGamePage()
 {
     fakeSocket = new QTcpSocket;
-    //fakeSocket->connectToHost("127.0.0.1", 10086);
-    fakeSocket->connectToHost("39.106.78.242", 10086);
+    fakeSocket->connectToHost("127.0.0.1", 10086);
+    //fakeSocket->connectToHost("39.106.78.242", 10086);
     connect(fakeSocket, &QTcpSocket::disconnected, this, &HomeGamePage::loseConnection);
 }
 

@@ -17,8 +17,8 @@ GamePage::GamePage(QWidget *parent)
     connect(this, &GamePage::timeToSue, this, &GamePage::sueForPeace);
     connect(this, &GamePage::timeToAbort, this, &GamePage::abort);
     client = new QTcpSocket(this);
-    //client->connectToHost("127.0.0.1", 10086);
-    client->connectToHost("39.106.78.242", 10086);
+    client->connectToHost("127.0.0.1", 10086);
+    //client->connectToHost("39.106.78.242", 10086);
     connect(client, &QTcpSocket::connected, this, &GamePage::versionVerify);
     connect(client, &QTcpSocket::readyRead, this, &GamePage::implementMessage);
     connect(client, &QTcpSocket::disconnected, this, &GamePage::loseConnection);
@@ -65,10 +65,9 @@ void GamePage::paintEvent(QPaintEvent *event){
 }
 
 void GamePage::paintChessBoard(QPainter& painter){
-    for(int i = 0; i < 14; i ++){
-        for(int j = 0; j < 14; j ++){
-            painter.drawRect(50 + j * 32, 50 + i * 32, 32, 32);
-        }
+    for (int i = 0; i < 15; i++) {
+        painter.drawLine(50 + i * 32, 50, 50 + i * 32, 498);
+        painter.drawLine(50, 50 + i * 32, 498, 50 + i * 32);
     }
 
     for(int i = 0; i < 15; i ++){
