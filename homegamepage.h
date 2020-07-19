@@ -13,6 +13,7 @@ public:
 
 protected:
     void getCurrentPlayerImplement(const QVector<qint8>& subcmd) override;
+    void initConnection() override;
 
 private:
     QTcpSocket* fakeSocket;

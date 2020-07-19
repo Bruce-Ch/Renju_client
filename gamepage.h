@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <QTcpSocket>
 #include <QVector>
+#include <QMap>
 #include <tuple>
 #include <string>
 #include <sstream>
@@ -46,6 +47,7 @@ protected:
     void paintLastMark(QPainter& painter);
 
     void sendInfo(qint8 cmd, const QVector<qint8>& info);
+    void sendForm(qint8 cmd, const QMap<QString, QString>& form);
     void updateWindow();
 
     virtual void goImplement(const QVector<qint8>& subcmd);
@@ -57,7 +59,7 @@ protected:
     virtual void getCurrentPlayerImplement(const QVector<qint8>& subcmd);
     virtual void getWinnerImplement(const QVector<qint8>& subcmd);
     virtual void updateLastImplement(const QVector<qint8>& subcmd);
-    virtual void versionVerifyImplement(const QVector<qint8>& subcmd);
+    virtual void errorImplement(const QVector<qint8>& errorNumber);
 
     std::pair<int, int> xy2idx(int x, int y);
     std::pair<int, int> getRealPoint(int x, int y);
@@ -80,7 +82,7 @@ protected slots:
     void abort();
     void implementMessage();
     void loseConnection();
-    void versionVerify();
+    virtual void initConnection();
 
     void on_retract_clicked();
     void on_sueForPeace_clicked();

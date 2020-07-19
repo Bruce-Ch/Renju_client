@@ -19,7 +19,7 @@ GamePage::GamePage(QWidget *parent)
     client = new QTcpSocket(this);
     //client->connectToHost("127.0.0.1", 10086);
     client->connectToHost("39.106.78.242", 10086);
-    connect(client, &QTcpSocket::connected, this, &GamePage::versionVerify);
+    connect(client, &QTcpSocket::connected, this, &GamePage::initConnection);
     connect(client, &QTcpSocket::readyRead, this, &GamePage::implementMessage);
     connect(client, &QTcpSocket::disconnected, this, &GamePage::loseConnection);
 }
@@ -30,10 +30,12 @@ GamePage::~GamePage()
     delete client;
 }
 
-void GamePage::versionVerify(){
-    QVector<qint8> version;
-    version << 0 << 2 << 0;
-    sendInfo(10, version);
+void GamePage::initConnection(){
+    QMap<QString, QString> form;
+    form["form_type"] = "1";
+    form["version"] = "v0.3.0";
+    form["game_mode"] = "3";
+    sendForm(11, form);
 }
 
 void GamePage::getCurrentPlayer(){
@@ -50,6 +52,13 @@ void GamePage::sendInfo(qint8 cmd, const QVector<qint8>& info){
     QByteArray block;
     QDataStream clientStream(&block, QIODevice::ReadWrite);
     clientStream << cmd << info;
+    client->write(block);
+}
+
+void GamePage::sendForm(qint8 cmd, const QMap<QString, QString>& form){
+    QByteArray block;
+    QDataStream clientStream(&block, QIODevice::ReadWrite);
+    clientStream << cmd << form;
     client->write(block);
 }
 
@@ -273,13 +282,27 @@ void GamePage::updateLastImplement(const QVector<qint8>& subcmd){
     update();
 }
 
-void GamePage::versionVerifyImplement(const QVector<qint8> &subcmd){
-    if(subcmd[0]){
-        QMessageBox msgBox;
-        QString info = "The version is too low. Please download the newest release.";
-        msgBox.setText(info);
-        msgBox.exec();
-        exit(1);
+void GamePage::errorImplement(const QVector<qint8> &errorNumber){
+    for(int en: errorNumber){
+        switch (en) {
+        case 0:{
+            break;
+        }
+        case 1:{
+            QMessageBox msgBox;
+            QString info = "The version is too low. Please download the newest release.";
+            msgBox.setText(info);
+            msgBox.exec();
+            exit(1);
+        }
+        case 2:{
+            qDebug() << "There is a syntax error.";
+            break;
+        }
+        default:{
+            qDebug() << "Unknown error number: " << en;
+        }
+        }
     }
 }
 
@@ -346,10 +369,10 @@ void GamePage::implementMessage(){
             updateLastImplement(subcmd);
             break;
         }
-        case 10:{
-            QVector<qint8> subcmd;
-            clientstream >> subcmd;
-            versionVerifyImplement(subcmd);
+        case 11:{
+            QVector<qint8> errorNumber;
+            clientstream >> errorNumber;
+            errorImplement(errorNumber);
             break;
         }
         default:
