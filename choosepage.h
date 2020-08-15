@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QMessageBox>
+#include "choosecolor.h"
 #include "gamepage.h"
 #include "internetgamepage.h"
 #include "homegamepage.h"
@@ -31,6 +32,7 @@ private slots:
 private:
     Ui::ChoosePage *ui;
     GamePage* gamePage;
+    ChooseColor* chooseColor;
 };
 
 #endif // CHOOSEPAGE_H

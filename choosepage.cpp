@@ -12,6 +12,7 @@ ChoosePage::~ChoosePage()
 {
     delete ui;
     delete gamePage;
+    delete chooseColor;
 }
 
 void ChoosePage::on_oneMachine_clicked()
@@ -30,10 +31,9 @@ void ChoosePage::on_twoMachine_clicked()
 
 void ChoosePage::on_peopleVSMachine_clicked()
 {
-    QMessageBox msgBox(this);
-    QString str = "该功能当前尚未开放！";
-    msgBox.setText(str);
-    msgBox.exec();
+    chooseColor = new ChooseColor;
+    close();
+    chooseColor->show();
 }
 
 void ChoosePage::on_help_clicked()

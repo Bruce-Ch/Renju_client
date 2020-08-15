@@ -16,23 +16,28 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    choosecolor.cpp \
     choosepage.cpp \
     clientboard.cpp \
     homegamepage.cpp \
     internetgamepage.cpp \
+    machinegamepage.cpp \
     main.cpp \
     gamepage.cpp \
     signup.cpp
 
 HEADERS += \
+    choosecolor.h \
     choosepage.h \
     clientboard.h \
     gamepage.h \
     homegamepage.h \
     internetgamepage.h \
+    machinegamepage.h \
     signup.h
 
 FORMS += \
+    choosecolor.ui \
     choosepage.ui \
     gamepage.ui \
     signup.ui
